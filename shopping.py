@@ -1,11 +1,12 @@
 import numpy as np
+from pandas import *
 
 def read_file(name):
     """
     Reads a given file and returns a list where the first value is the number of test cases, and the second
     is a list of dictionaries, each of which contains the information to run a specific test case
     :param name: name of the file
-    :return: List of information for test cases for shopping() 
+    :return: List of information for test cases for shopping()
     """
     with open(name, 'r') as datafile:
         lines = datafile.read().splitlines()
@@ -16,8 +17,7 @@ def read_file(name):
     i = 1
     while i < len(lines):
         case_info = {
-            "weights": [],
-            "prices": [],
+            "items": {0: 0},
             "capacities": []
             }
         # get # of items and iterate through and store info for this case
@@ -27,8 +27,8 @@ def read_file(name):
 
         for n in range(items):
             item_desc = lines[i].split()    # item_desc[0] is price, #item_info[1] is weight
-            case_info["prices"].append(item_desc[0])
-            case_info["weights"].append(item_desc[1])
+            items = case_info["items"]
+            items[int(item_desc[0])] = int(item_desc[1])
             # do stuff with item
             i += 1
 
@@ -56,21 +56,41 @@ def get_max_capacity(weight_list):
 def main():
     test_case = read_file("shopping.txt")
     case_list = test_case[1]
-
+    testcase_num = 0
     for case in case_list:
+        testcase_num += 1
         items = case["items"]
-        prices = case["prices"]
-
         family = case["capacities"]
-        num_items = len(prices)
+        num_items = len(items)
         maxCap = get_max_capacity(family)       # highest carrying capacity in family
 
-        # create DPT
-        dpt = [[0 for x in range(num_items+1)] for y in range(maxCap+1)]
-        row = 0
-        for item in range(num_items+1):
-            i = row         # index for e asily accessing menu
+        # create dynamic programming table to store all sub-problem results
+        dpt = [[0 for x in range(maxCap+1)] for _ in range(num_items+1)]
+        row = 1
+        for item in items:
+            if item == 0:
+                pass
+            else:
+                item_weight = items[item]
+                for capacity in range(1, maxCap+1):
+                    if item_weight <= capacity:
+                        dpt[row][capacity] = max(item + dpt[row - 1][capacity - item_weight],
+                                                  dpt[row - 1][capacity])
+                    else:
+                        dpt[row][capacity] = dpt[row-1][capacity]
             row += 1
+
+        print(testcase_num)
+        print(DataFrame(dpt))
+        """ 
+        for item in range(1, num_items):
+            item_price = list(items)[item]
+            item_weight = items[item_price]
+            for capacity in range(1, maxCap):
+                if item_weight <= capacit
+                    dpt[item][capacity] = max(items[item_weight] + dpt[item-1][capacity-item_weight], dpt[item-1][capacity])
+        """
+    #print(np.matrix(dpt))
 
 
 
