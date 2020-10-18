@@ -5,7 +5,7 @@ def read_file(name):
     Reads a given file and returns a list where the first value is the number of test cases, and the second
     is a list of dictionaries, each of which contains the information to run a specific test case
     :param name: name of the file
-    :return: List of information for test cases for shopping()
+    :return: List of information for test cases for shopping() 
     """
     with open(name, 'r') as datafile:
         lines = datafile.read().splitlines()
