@@ -1,6 +1,8 @@
-import numpy as np
-from pandas import *
-
+"""
+        Peyton Fitzgerald
+        CS325
+        Dynamic Programming Assignment -> 1/0 Knapsack problem for an entire family.
+"""
 def read_file(name):
     """
     Reads a given file and returns a list where the first value is the number of test cases, and the second
@@ -46,30 +48,23 @@ def read_file(name):
 
 def write_file(results_list):
     """
-    print("Test Case " + str(case_num))
-    max_value = results[0]
-    print("Total Price is " + str(max_value))
-    print("Member Items")
-    family_list = results[1]
-    num = 0
-    for i in range(len(family_list)-1, -1, -1):
-        num += 1
-        print(str(num) + ": ", end='')
-        item_list = family_list[i-1]
-        for item in range(len(item_list)):
-            if item_list[item] == 1:
-                print(item+1, end=' ')
-        print()
+    Takes an array of test case results and writes each one to a new file called shopping,out
+    :param results_list: array of test case results
+    :return: Writes a file (mimicing the structure of shopping.txt) containing all of the test case results
     """
 
     with open("shopping.out", 'w') as f:
         case_num = 0
+        # for each case
         for results in results_list:
+            # each case contains an array - first index contains the max $ they could get, second is an array
+            # of the items chosen by each family member
             case_num += 1
             max_value = results[0]
-            f.write('Test Case ' + str(case_num) +'\n' + 'The total price is ' + str(max_value) + '\n' + 'Member Items\n')
+            f.write('Test Case ' + str(case_num) +'\n' + 'Total Price ' + str(max_value) + '\n' + 'Member Items\n')
             family_list = results[1]
             num = 0
+            # iterate over each family member's list and write results
             for i in range(len(family_list) - 1, -1, -1):
                 num += 1
                 f.write(str(num) + ": ")
@@ -83,6 +78,11 @@ def write_file(results_list):
 
 
 def get_max_capacity(weight_list):
+    """
+    Gets the maximum carrying capacity from an array of weights.
+    :param weight_list: array of carrying capacities
+    :return: maximum carrying capacity
+    """
     max_capacity = 0
     for capacity in weight_list:
         max_capacity = max(max_capacity, int(capacity))
@@ -122,15 +122,21 @@ def main():
 
         case_results = [0, []]
         for member in range(len(family)):
-
+            # create an array to store the family member's list of items taken
             item_list = [0] * (num_items - 1)
             capacity = family[member]
             row = num_items
+            # use the dp table to get the optimal value for their carrying capacity
             max_value += dpt[row][capacity]
+            # backtrack through DP table to get the items that make up their specific optimal value
             while capacity > 0 and row > 0:
+                # move up until we find a non-unique cell value
                 if dpt[row][capacity] == dpt[row-1][capacity]:
                     row -= 1
                 else:
+                    # if non-unique, this row's item was taken. Add it to their list, and then
+                    # subtract the item's weight from their carrying capacity (moving left in columns)
+                    # and move up in the table (moving up by 1 in rows).
                     cur_item_weight = items[(list(items)[row-1])]
                     item_list[row-2] = 1
                     capacity = capacity - cur_item_weight
@@ -141,8 +147,6 @@ def main():
     write_file(results_list)
 
 
-
-    #write_file("results.txt")
 
 
 if __name__ == '__main__':
